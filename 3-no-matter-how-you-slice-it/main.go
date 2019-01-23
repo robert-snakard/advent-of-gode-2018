@@ -35,8 +35,10 @@ func main() {
 }
 
 func part_1(claims []claim) int{
-	for _, claim := range claims {
-		fmt.Println("CLAIM:", claim)
+	for idx, claim := range claims {
+		if idx + 1 != claim.id {
+			panic(errors.New("ID CHECK FIALED")
+		}
 	}
 	return 3
 }
