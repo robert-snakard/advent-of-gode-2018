@@ -4,19 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"../shared"
 )
-
-func check(e error) {
-	if e != nil {
-		fmt.Println("Go has encountered an error:", e)
-		panic(e)
-	}
-}
 
 func main() {
 	// Read input text
 	dat, err := ioutil.ReadFile("input.txt")
-	check(err)
+	check.Check(err)
 
 	data := strings.Split(string(dat), "\n")
 	// From this point forward I've edited all input.txts so that it never ends in a newline
