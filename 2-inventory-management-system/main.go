@@ -13,6 +13,18 @@ func check(e error) {
 	}
 }
 
+/*******
+Research for this problem includes the following research paper and stackoverflow question.
+This research was for implementing a solution for part 2. that did not take O(n^2k) time.
+
+- Directory Matching nad Indexing with Errors and Don't Cares
+	https://cs.nyu.edu/~adi/CGL04.pdf
+- Data structure or algorithm for quickly finding differences between strings
+	https://cs.stackexchange.com/questions/93467/data-structure-or-algorithm-for-quickly-finding-differences-between-strings
+
+The current solution does not use this research and is a simple solution that doea take O(n^2k) time.
+******/
+
 func main() {
 	// Read input text
 	dat, err := ioutil.ReadFile("input.txt")
