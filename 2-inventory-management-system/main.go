@@ -25,6 +25,7 @@ func main() {
 	}
 
 	fmt.Println("Part 1 Solution:", part_1(boxids))
+	fmt.Println("Part 2 Solution:", part_2(boxids))
 }
 
 func part_1(boxids []string) int {
@@ -32,12 +33,13 @@ func part_1(boxids []string) int {
 	three_count := 0
 
 	for _, id := range boxids {
-		fmt.Println("ID:", id)
+		// Count letters in box id
 		var letter_count [26]int
 		for _, letter := range id {
 			letter_count[int(letter)-int('a')]++
 		}
 
+		// Figure out if id has a double letter and/or a triple letter
 		two_flag := false
 		three_flag := false
 		for _, count := range letter_count {
@@ -55,6 +57,34 @@ func part_1(boxids []string) int {
 		}
 	}
 
-	fmt.Println("two:", two_count, "three:", three_count)
 	return three_count * two_count
+}
+
+func part_2(boxids []string) string {
+	var id_solution string
+	var comp_solution string
+	Outer: for _, id := range boxids {
+		for _, comparison := range boxids {
+			diffs := 0
+			for i := 0; i < len(id); i++ {
+				if id[i] != comparison[i] {
+					diffs++
+				}
+			}
+			if diffs == 1 {
+				id_solution = id
+				comp_solution = comparison
+				break Outer
+			}
+		}
+	}
+
+	final_solution := ""
+	for i := 0; i < len(id_solution); i++ {
+		if id_solution[i] == comp_solution[i] {
+			final_solution += string(id_solution[i])
+		}
+	}
+
+	return final_solution
 }
