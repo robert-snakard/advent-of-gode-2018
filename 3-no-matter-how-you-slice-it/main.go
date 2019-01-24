@@ -35,12 +35,25 @@ func main() {
 }
 
 func part_1(claims []claim) int{
-	for idx, claim := range claims {
-		if idx + 1 != claim.id {
-			panic(errors.New("ID CHECK FIALED")
+	var fabric [1000][1000]int
+	for _, claim := range claims {
+		for i := claim.toff; i < claim.toff + claim.height; i++ {
+			for j := claim.loff; j < claim.loff + claim.width; j++ {
+				fabric[i][j]++
+			}
 		}
 	}
-	return 3
+
+	var inch_count int
+	for _, row := range fabric {
+		for _, sqr_in := range row {
+			if sqr_in > 1 {
+				inch_count++
+			}
+		}
+	}
+
+	return inch_count
 }
 
 // The function ParseData assumes that the input is all ascii and nothing has to be
