@@ -32,10 +32,13 @@ func main() {
 	check.Check(err)
 
 	fmt.Println("Part 1 Solution:", part_1(claims))
+	fmt.Println("Part 2 Solution:", part_2(claims))
 }
 
 func part_1(claims []claim) int{
 	var fabric [1000][1000]int
+
+	// Fill fabric array with claims
 	for _, claim := range claims {
 		for i := claim.toff; i < claim.toff + claim.height; i++ {
 			for j := claim.loff; j < claim.loff + claim.width; j++ {
@@ -44,16 +47,50 @@ func part_1(claims []claim) int{
 		}
 	}
 
+	// count # of square inches covered by more than one claim
 	var inch_count int
 	for _, row := range fabric {
-		for _, sqr_in := range row {
-			if sqr_in > 1 {
+		for _, claims_on_sqr_in := range row {
+			if claims_on_sqr_in > 1 {
 				inch_count++
 			}
 		}
 	}
 
 	return inch_count
+}
+
+func part_2(claims []claim) claim{
+	var fabric [1000][1000]int
+
+	// Label the sq_in as -1 if it contains overlapping claims
+	for _, claim := range claims {
+		for i := claim.toff; i < claim.toff + claim.height; i++ {
+			for j := claim.loff; j < claim.loff + claim.width; j++ {
+				if fabric[i][j] == 0 {
+					fabric[i][j] = claim.id
+				} else {
+					fabric[i][j] = -1
+				}
+			}
+		}
+	}
+
+	// For each claim, check that no sq_in is overlapping (set to -1)
+	ClaimLoop: for _, claim := range claims {
+		for i := claim.toff; i < claim.toff + claim.height; i++ {
+			for j := claim.loff; j < claim.loff + claim.width; j++ {
+				if fabric[i][j] == -1 {
+					continue ClaimLoop
+				}
+			}
+		}
+
+		// We'll only get here if we don't continue (the claim does not ever overlap)
+		return claim
+	}
+
+	return claim{}
 }
 
 // The function ParseData assumes that the input is all ascii and nothing has to be
