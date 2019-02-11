@@ -38,7 +38,76 @@ func main() {
 }
 
 func part_1(events []Event) int{
-	return 4
+	// Key is guards id, array is all the time intervals that guard fell asleep
+	sleep_intervals := make(map[int][]Interval)
+
+	cur_id := -1
+	var cur_state State
+	// Fill sleep intervals map
+	for _, evt := range events {
+		if evt.state == NewGuard {
+			cur_id = evt.guard_id
+			cur_state = NewGuard
+			continue
+		}
+
+		if cur_id < 0 {
+			panic(errors.New("invalid guard id"))
+		}
+
+		// If the guard falls asleep add a new interval. If he wakes up complete the previous interval
+		switch evt.state {
+			case FallsAsleep:
+				sleep_intervals[cur_id] = append(sleep_intervals[cur_id], Interval{evt.time.Minute(), 0})
+				cur_state = FallsAsleep
+			case WakesUp:
+				if cur_state != FallsAsleep {
+					panic(errors.New("woke up without falling asleep first"))
+				}
+				sleep_intervals[cur_id][len(sleep_intervals[cur_id])-1].end = evt.time.Minute()
+			default:
+				panic(errors.New("invalid state"))
+		}
+	}
+
+	sleep_sum := make(map[int]int)
+	sleep_counters := make(map[int]*[60]int)
+	// initialize sleep_counters. Have to use pointers b/c Go's maps don't play nicely when
+	// holding objects that are larger than 'size_t' bytes. The other strategy would be to
+	// use a temp variable on each assignment but this becomes more inefficient the more times
+	// we access each object
+	for key, _ := range sleep_intervals {
+		cur_id := key
+		sleep_counters[cur_id] = &[60]int{}
+	}
+
+	var max_sum, max_id int
+	// find guard that's asleep the longest (max_id) and which minute he's asleep the longest for (sleep_counters)
+	for key, val := range sleep_intervals {
+		cur_id := key
+		for _, interval := range val {
+			for i := interval.start; i < interval.end; i++ {
+				sleep_sum[cur_id]++
+				(*sleep_counters[cur_id])[i]++
+
+				if max_sum < sleep_sum[cur_id] {
+					max_id = cur_id
+					max_sum = sleep_sum[cur_id]
+				}
+
+			}
+		}
+	}
+
+	var max_idx int
+	// Where max_idx is the minute the guard most commonly fell asleep at
+	for idx, minutes := range sleep_counters[max_id] {
+		if minutes > sleep_counters[max_id][max_idx] {
+			max_idx = idx
+		}
+	}
+
+	return max_id * max_idx
 }
 
 type State int
@@ -90,11 +159,11 @@ func ParseIntoEvents(data []string) ([]Event, error){
 	}
 
 	sort.Sort(byDateTime(events))
-	return events nil
+	return events, nil
 }
 
 // Helper Functions for sorting
-type byDateTime []ParsedLine
+type byDateTime []Event
 func (s byDateTime) Len() int {
 	return len(s)
 }
